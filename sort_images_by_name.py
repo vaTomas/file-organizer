@@ -2,7 +2,7 @@ import os
 import re
 import shutil
 
-def sort_files(scan_dir, dest_dir):
+def sort_files(scan_dir, dest_dir, allowed_file_types=None):
     # Ensure the destination directory exists
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
@@ -14,8 +14,15 @@ def sort_files(scan_dir, dest_dir):
     # Walk the scan directory recursively
     for root, dirs, files in os.walk(scan_dir):
         for file in files:
+            # If allowed_file_types is specified, check the file extension
+            if allowed_file_types:
+                ext = os.path.splitext(file)[1].lower()
+                allowed = [ft.lower().strip() for ft in allowed_file_types]
+                if ext not in allowed:
+                    continue
+
             date_str = None
-            # Check for the first format: yyyyMMdd
+            # Check for the first format: yyyyMMdd_
             match = pattern1.match(file)
             if match:
                 year, month, day = match.groups()
@@ -58,7 +65,11 @@ def main():
             print(f"Error creating destination directory '{dest_dir}': {e}")
             return
 
-    sort_files(scan_dir, dest_dir)
+    # Ask user for allowed file types
+    allowed_types_input = input("Enter allowed file types/extensions (comma separated, e.g. .jpg,.png) or leave blank for all files: ").strip()
+    allowed_file_types = [ft.strip() for ft in allowed_types_input.split(',')] if allowed_types_input else None
+
+    sort_files(scan_dir, dest_dir, allowed_file_types)
 
 if __name__ == '__main__':
     main()
