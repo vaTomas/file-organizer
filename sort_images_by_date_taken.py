@@ -4,6 +4,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 from datetime import datetime
 
+
 def get_date_taken(image_path):
     """
     Extract the date an image was taken from its metadata.
@@ -21,6 +22,7 @@ def get_date_taken(image_path):
     except Exception as e:
         print(f"Error reading metadata from {image_path}: {e}")
     return None
+
 
 def organize_images_by_date(src_folder, dest_folder, allowed_file_types):
     """
@@ -58,6 +60,7 @@ def organize_images_by_date(src_folder, dest_folder, allowed_file_types):
                     print(f"No 'Date Taken' found for {file}. Skipping...")
             except Exception as e:
                 print(f"Error processing {file_path}: {e}")
+
 
 if __name__ == "__main__":
     source_folder = input("Enter the source folder path containing images: ").strip()
