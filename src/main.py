@@ -1,11 +1,11 @@
 import os
 
-from sort_images_by_date_taken import organize_images_by_date as group_by_date_taken
-from delete_empty_folder import delete_empty_folders as delete_empty_folders
-from sort_images_by_name_date import sort_files as group_by_name_date
-from sort_files_by_media_created import sort_by_media_created as group_by_media_created
-from sort_files_by_name import sort_files as group_by_name
-from group_folders_by_year import group_folders_by_year as group_folders
+from grouping.group_files_by_name import sort_files as group_by_name
+from delete_empty_folders import delete_empty_folders as delete_empty_folders
+from grouping.group_images_by_name_date import sort_files as group_by_name_date
+from grouping.group_folders_by_year import group_folders_by_year as group_folders
+from grouping.group_images_by_date_taken import organize_images_by_date as group_by_date_taken
+from grouping.group_files_by_media_created import sort_by_media_created as group_by_media_created
 
 
 def main():
