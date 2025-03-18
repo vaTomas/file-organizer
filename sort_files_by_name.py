@@ -50,7 +50,7 @@ def sort_files(scan_dir, target_dir, startswith=None, endswith=None, contains=No
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
 
-    for root, dirs, files in os.walk(scan_dir):
+    for root, _, files in os.walk(scan_dir):
         for file in files:
             if file_matches(file, startswith, endswith, contains, match_case, allowed_file_types):
                 source_file = os.path.join(root, file)
