@@ -117,36 +117,48 @@ def verify_and_repair_par2(par2_file_path, repair=True):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return False
+    
 
-
-def append_par2_extension(file_path):
+def append_file_extension(file_path, file_extension):
     """
-    Appends the .par2 extension to a file path if it doesn't already have it.
+    Appends the .file extension to a file path if it doesn't already have it.
 
     Args:
         file_path (str): The file path.
+        file_extension (str): The file extension.
 
     Returns:
-        str: The file path with the .par2 extension appended, or the original path if it already has it.
+        str: The file path with the .file extension appended, or the original path if it already has it.
     """
-    if not file_path.lower().endswith(".par2"):
-        return file_path + ".par2"
+    file_extension = file_extension.lower()
+    if not file_extension.startswith('.'):
+        file_extension = '.' + file_extension
+
+    if not file_path.lower().endswith(file_extension):
+        return file_path + file_extension
     else:
         return file_path
 
 
-def main():
-    folder_path = input("Enter the directory folder: ")
-
+def verify_and_extract_archives(folder_path):
     if not os.path.exists(folder_path):
         print(f"Error: Folder '{folder_path}' does not exist.")
         return
-
+    
     archive_files = find_7z_files(folder_path)
 
     for file in archive_files:
-        if verify_and_repair_par2(append_par2_extension(file)):
+        file_path = remove_7z_extension(file)
+
+        if verify_and_repair_par2(append_file_extension(file_path, '.7z.par2')):
             extract_7z(file, remove_7z_extension(file))
+        elif verify_and_repair_par2(append_file_extension(file, '.7z.001.par2')):
+            extract_7z(file, remove_7z_extension(file))            
+
+
+def main():
+    folder_path = input("Enter the directory folder: ")  
+    verify_and_extract_archives(folder_path)
 
 
 if __name__ == "__main__":
