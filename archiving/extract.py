@@ -47,11 +47,17 @@ def extract_7z(archive_path, extract_path):
         print(f"Error: 7z archive not found: {archive_path}")
         return False
 
+    command = [
+        "7z",
+        "x",
+        archive_path,
+        f"-o{extract_path}",
+        "-y",
+        "-spe",
+    ]
+
     try:
-        subprocess.run(
-            ["7z", "x", archive_path, f"-o{extract_path}", "-y"],
-            check=True,
-        )
+        subprocess.run(command, check=True)
         print(f"Successfully extracted {archive_path} to {extract_path}")
         return True
     except subprocess.CalledProcessError as e:
