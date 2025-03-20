@@ -6,6 +6,7 @@ from grouping.group_images_by_name_date import sort_files as group_by_name_date
 from grouping.group_folders_by_year import group_folders_by_year as group_folders
 from grouping.group_images_by_date_taken import organize_images_by_date as group_by_date_taken
 from grouping.group_files_by_media_created import sort_by_media_created as group_by_media_created
+from match_files_by_name_start import sort_by_matching_name as match_by_name
 
 
 def main():
@@ -17,28 +18,38 @@ def main():
 
     group_by_name(
         scan_dir = src_dir,
-        target_dir = os.path.join(dest_dir, 'facebook_messenger'),
+        target_dir = os.path.join(dest_dir, r'unsorted\facebook\facebook_messenger'),
         startswith = 'received_',
         match_case = True,
         allowed_file_types=['.jpeg', '.png', '.gif']
-        )
+    )
     
     group_by_name(
         scan_dir = src_dir,
-        target_dir = os.path.join(dest_dir, 'facebook'),
+        target_dir = os.path.join(dest_dir, r'unsorted\facebook'),
         startswith = 'FB_IMG_',
         match_case = True,
         allowed_file_types=['.jpg']
-        )
+    )
     
     group_by_name(
         scan_dir = src_dir,
-        target_dir = os.path.join(dest_dir, 'screenshots'),
+        target_dir = os.path.join(dest_dir, r'unsorted\screenshots'),
         startswith = 'screenshot',
         allowed_file_types=['.jpg', '.png']
-        )
+    )
     
-    group_by_name_date(src_dir, dest_dir, ['.png', '.jpg', '.jpeg', '.mov', '.mp4', '.modd'])
+    group_by_name_date(
+        src_dir,
+        dest_dir,
+        ['.png', '.jpg', '.jpeg', '.mov', '.mp4', '.modd']
+    )
+
+    match_by_name(
+        src_dir,
+        dest_dir,
+        ['.aee', '.thm', '.modd']
+    )
 
     group_folders(dest_dir, dest_dir)
 

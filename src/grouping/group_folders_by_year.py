@@ -21,10 +21,13 @@ def group_folders_by_year(src_folder, dest_folder):
         item_path = os.path.join(src_folder, item)
 
         if os.path.isdir(item_path):
-            try:
-                year = item.split('_')[0]  # Extract the year from the folder name
-                year_folder = os.path.join(dest_folder, year)
+            year = item.split('_')[0]  # Extract the year from the folder name
+            year_folder = os.path.join(dest_folder, year)
+            
+            if item_path == year_folder:
+                continue
 
+            try:
                 if not os.path.exists(year_folder):
                     os.makedirs(year_folder)
 
