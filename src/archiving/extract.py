@@ -1,24 +1,12 @@
 import os
+import sys
+import shutil
 import subprocess
 
+__parent_dir__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(__parent_dir__)
 
-def find_7z_files(directory):
-    """
-    Finds all 7z files in the given directory and its subdirectories.
-
-    Args:
-        directory (str): The directory to search.
-
-    Returns:
-        list: A list of full file paths to 7z files (including .7z.001 files).
-    """
-    seven_z_files = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.lower().endswith(".7z") or file.lower().endswith(".7z.001"):
-                full_path = os.path.join(root, file)
-                seven_z_files.append(full_path)
-    return seven_z_files
+from find_files_by_name import find_files_by_name as find_files
 
 
 def remove_7z_extension(file_path):
@@ -151,20 +139,41 @@ def verify_and_extract_archives(folder_path):
         print(f"Error: Folder '{folder_path}' does not exist.")
         return
     
-    archive_files = find_7z_files(folder_path)
+    _7z_files =  find_files(folder_path, ends_with = '.7z', search_subdir = True)
+    _7z_volume_files = find_files(folder_path, ends_with = '.7z.001', search_subdir = True)
+    archive_files = _7z_files | _7z_volume_files
+    
+    if not archive_files:
+        return print(f"No archives found in directory: {folder_path}")
 
-    for file in archive_files:
-        file_path = remove_7z_extension(file)
+    for file_path in archive_files:
+        file_path_name = remove_7z_extension(file_path)
+        directory, _ = os.path.split(file_path)
+        parent_folder_name = os.path.basename(directory)
 
-        if verify_and_repair_par2(append_file_extension(file_path, '.7z.par2')):
-            extract_7z(file, remove_7z_extension(file))
-        elif verify_and_repair_par2(append_file_extension(file, '.7z.001.par2')):
-            extract_7z(file, remove_7z_extension(file))            
+        if verify_and_repair_par2(append_file_extension(file_path_name, '.7z.par2')):
+            extract_7z(file_path, remove_7z_extension(file_path))
+        elif verify_and_repair_par2(append_file_extension(file_path_name, '.7z.001.par2')):
+            extract_7z(file_path, remove_7z_extension(file_path))
+        
+        try:
+            items_in_dir = os.listdir(directory)
+            if parent_folder_name in items_in_dir:
+                children_dir_path = os.path.join(directory, parent_folder_name)
+                for child in os.listdir(children_dir_path):
+                    child_path = os.path.join(children_dir_path, child)
+                    shutil.move(child_path, os.path.dirname(children_dir_path))
+                os.rmdir(children_dir_path)
+        except FileNotFoundError:
+            print(f"Warning: Directory '{directory}' not found after extraction.")
+        except Exception as e:
+            print(f"An error occurred while moving folder: {e}")   
 
 
 def main():
     folder_path = input("Enter the directory folder: ")  
     verify_and_extract_archives(folder_path)
+    print("Done!")
 
 
 if __name__ == "__main__":
