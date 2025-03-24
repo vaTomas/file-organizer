@@ -1,5 +1,15 @@
-import subprocess
 import os
+import sys
+import math
+import subprocess
+
+__parent_dir__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(__parent_dir__)
+
+from size_of_directory import get_directory_size as get_size
+from find_files_by_name import find_files_by_name as find_files
+from file_extention_helper import replace_file_extension as replace_file_extension
+
 
 def create_7z_archive(folder_path, archive_path):
     """
@@ -14,7 +24,6 @@ def create_7z_archive(folder_path, archive_path):
         print(f"Error: Folder '{folder_path}' not found.")
         return
 
-    # 7z a -t7z -mx9 -ms16g -v4292m -ssp -stl -spe "D:\programming\sort_folder\test\2005\2005.7z" "D:\programming\sort_folder\test\2005"
     command = [
         "7z",
         "a",
@@ -45,24 +54,38 @@ def create_7z_archive(folder_path, archive_path):
         return False
 
 
-def create_par2_recovery(src_files, redundancy_rate = 10, slice_size = 4096):
+# src_files must not be relative
+def create_par2_recovery(src_files, redundancy_rate: int = 10, slice_size_factor: int = 4096, maximum_recovery_file_size: int = 4290772992):
+    
 
+    src_files_paths = set()
     for file in src_files:
         if not os.path.exists(file):
             print(f"Error: File or directory not found: {file}")
             return False
+        
+        if not os.path.isabs(file):
+            src_files_paths.add(os.path.abspath(file))
 
-    output_directory = src_files[0][:-4] + '.par2'
+    output_directory = sorted(list(src_files_paths), key=len)[0] + '.par2'
+    if os.path.exists(output_directory):
+        raise FileExistsError(f"Output file already exists: {output_directory}")
+
+    source_files_size = get_size(src_files_paths)
+    recovery_file_count = math.ceil((source_files_size * redundancy_rate/100) / maximum_recovery_file_size)
+           
 
     command = [
         "par2j64",
         "c",
         f"/rr{redundancy_rate}",
-        f"/sm{slice_size}",
+        f"/sm{slice_size_factor}",
+        "/rd0",
+        f"/rf{recovery_file_count}",
         "/lc256", #Max cores (0) + GPU (+256) 
         output_directory
     ]
-    command.extend(src_files)
+    command.extend(src_files_paths)
 
     try:
         subprocess.run(command, check=True)
@@ -79,28 +102,6 @@ def create_par2_recovery(src_files, redundancy_rate = 10, slice_size = 4096):
         return False
 
 
-def find_paths_starting_with(search_path, filter_str):
-    """
-    Finds all file and directory paths within a search path that start with a given filter string.
-
-    Args:
-        search_path (str): The directory to search within.
-        filter_str (str): The string that paths must start with.
-
-    Returns:
-        list: A list of full paths that start with the filter string.
-    """
-    matching_paths = []
-    if not os.path.exists(search_path):
-        return matching_paths
-
-    for item in os.listdir(search_path):
-        full_path = os.path.join(search_path, item)
-        if item.startswith(filter_str):
-            matching_paths.append(full_path)
-    return matching_paths
-
-
 def archive_and_parchive(folder_path):
     if not os.path.exists(folder_path):
         print(f"Error: Folder '{folder_path}' not found.")
@@ -109,11 +110,21 @@ def archive_and_parchive(folder_path):
     folder_name = os.path.basename(folder_path)
     output_path = os.path.join(folder_path, folder_name + '.7z')
 
-    if not create_7z_archive(folder_path, output_path):
-        return
+    try:
+        create_7z_archive(folder_path, output_path)
+    except FileExistsError:
+        pass
+    except Exception as e:
+        raise Exception(f"An unknown error occured: {e}")
     
-    archive_paths = find_paths_starting_with(folder_path, os.path.basename(output_path))
-    create_par2_recovery(archive_paths)
+    archive_paths = find_files(folder_path, starts_with=os.path.basename(output_path))
+
+    try:
+        create_par2_recovery(archive_paths)
+    except FileExistsError:
+        return
+    except Exception as e:
+        raise Exception(f"An unknown error occured: {e}")
 
 
 def archive_and_parchive_subfolders(folder_path):
@@ -134,7 +145,6 @@ def archive_and_parchive_subfolders(folder_path):
 
 def main():
     folder_path = input("Enter the directory folder: ")
-    # archive_and_parchive(folder_path)
     archive_and_parchive_subfolders(folder_path)
 
 

@@ -58,7 +58,9 @@ def get_directory_size(path: Union[str, Set[str]]) -> Optional[int]:
     Returns:
         int: The total size of the folder in bytes, or None if the file, files, or folder doesn't exist.
     """
-    
+    if not isinstance(path, set) and not isinstance(path, str):
+        raise TypeError("Path must be a string or a set of strings representation of a path/s.") 
+
     if isinstance(path, set): #if set of files or folders
         path = remove_redundant_items_in_set(path)
 

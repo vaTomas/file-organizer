@@ -7,6 +7,7 @@ __parent_dir__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(__parent_dir__)
 
 from find_files_by_name import find_files_by_name as find_files
+from file_extention_helper import append_file_extension as append_file_extension
 
 
 def remove_7z_extension(file_path):
@@ -111,30 +112,12 @@ def verify_and_repair_par2(par2_file_path, repair=True):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return False
-    
-
-def append_file_extension(file_path, file_extension):
-    """
-    Appends the .file extension to a file path if it doesn't already have it.
-
-    Args:
-        file_path (str): The file path.
-        file_extension (str): The file extension.
-
-    Returns:
-        str: The file path with the .file extension appended, or the original path if it already has it.
-    """
-    file_extension = file_extension.lower()
-    if not file_extension.startswith('.'):
-        file_extension = '.' + file_extension
-
-    if not file_path.lower().endswith(file_extension):
-        return file_path + file_extension
-    else:
-        return file_path
 
 
 def verify_and_extract_archives(folder_path):
+    if not os.path.isabs(folder_path):
+        folder_path = os.path.abspath(folder_path)
+
     if not os.path.exists(folder_path):
         print(f"Error: Folder '{folder_path}' does not exist.")
         return

@@ -28,7 +28,6 @@ def find_files_by_name(
     Returns:
         set: A set of full file paths to matching files.
     """
-
     if not os.path.isdir(directory):
         raise NotADirectoryError(f"Path is not a directory: {directory}")
     
