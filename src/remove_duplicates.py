@@ -59,7 +59,7 @@ def move_to_duplicates(file: str, dir_path: str) -> None:
 def main():
     dir_path = input("Path: ")
     if not os.path.isdir(dir_path):
-        return NotADirectoryError(f"Path is not a directory: {path}")
+        return NotADirectoryError(f"Path is not a directory: {dir_path}")
     
     file_types = {'.png', '.jpg', '.mp4', '.mov'}
     duplicate_files = find_duplicates(dir_path, file_types)

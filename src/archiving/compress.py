@@ -64,8 +64,7 @@ def create_par2_recovery(src_files, redundancy_rate: int = 10, slice_size_factor
             print(f"Error: File or directory not found: {file}")
             return False
         
-        if not os.path.isabs(file):
-            src_files_paths.add(os.path.abspath(file))
+        src_files_paths.add(os.path.abspath(file))
 
     output_directory = sorted(list(src_files_paths), key=len)[0] + '.par2'
     if os.path.exists(output_directory):
