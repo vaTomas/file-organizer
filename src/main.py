@@ -13,9 +13,6 @@ def main():
     src_dir = input("Enter the directory to scan for image files: ").strip()
     dest_dir = input("Enter the destination directory for sorted folders: ").strip()
 
-    group_by_date_taken(src_dir, dest_dir, ['.png', '.jpg', '.jpeg'])
-    group_by_media_created(src_dir, dest_dir, ['.mov', '.mp4'], 'Asia/Singapore')
-
     group_by_name(
         scan_dir = src_dir,
         target_dir = os.path.join(dest_dir, r'unsorted\facebook\facebook_messenger'),
@@ -23,6 +20,9 @@ def main():
         match_case = True,
         allowed_file_types=['.jpeg', '.png', '.gif']
     )
+    
+    group_by_date_taken(src_dir, dest_dir, ['.png', '.jpg', '.jpeg', '.cr2'])
+    group_by_media_created(src_dir, dest_dir, ['.mov', '.mp4', '.cr2'], 'Asia/Singapore')
     
     group_by_name(
         scan_dir = src_dir,
